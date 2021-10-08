@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorator="layout/layout1">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<div layout:fragment="content">
+    <h1>Ex1</h1>
+    <h2 th:text="${'Hello1'}"></h2>
+    <h2>[[${'Hello2'}]]</h2>
+</div>
+
+</body>
+</html>
