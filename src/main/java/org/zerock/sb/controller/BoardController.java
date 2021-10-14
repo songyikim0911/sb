@@ -24,8 +24,8 @@ public class BoardController {
     @GetMapping("/list")
     public void list(PageRequestDTO pageRequestDTO, Model model){//담아서 보내야 하므로 모델필요
 
-        model.addAttribute("responseDTO", boardService.getList(pageRequestDTO));
-
+        //model.addAttribute("responseDTO", boardService.getList(pageRequestDTO));
+        model.addAttribute("responseDTO", boardService.getListWithReply(pageRequestDTO));
     }
 
     @GetMapping("/register")

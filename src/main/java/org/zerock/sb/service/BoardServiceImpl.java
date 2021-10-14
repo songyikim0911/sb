@@ -9,11 +9,13 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.zerock.sb.dto.BoardDTO;
+import org.zerock.sb.dto.BoardListDTO;
 import org.zerock.sb.dto.PageRequestDTO;
 import org.zerock.sb.dto.PageResponseDTO;
 import org.zerock.sb.entity.Board;
 import org.zerock.sb.repository.BoardRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -55,6 +57,47 @@ public class BoardServiceImpl implements BoardService {
         long totalCount = result.getTotalElements();
 
         return new PageResponseDTO<>(pageRequestDTO, (int)totalCount, dtoList);
+
+    }
+
+    @Override
+    public PageResponseDTO<BoardListDTO> getListWithReply(PageRequestDTO pageRequestDTO) {
+
+        char[] typeArr = pageRequestDTO.getTypes();
+        String keyword = pageRequestDTO.getKeyword();
+
+        Pageable pageable = PageRequest.of(pageRequestDTO.getPage()-1,//pageable은 페이지가 0부터 시작하기 때문에,,-1필요
+                pageRequestDTO.getSize(),
+                Sort.by("bno").descending());
+
+        Page<Object[]> result = boardRepository.searchWithReplyCount(typeArr, keyword, pageable);
+//result의 결고물은 현재
+        //배열1:[110,title...110, user...0, 2021-20-07,0]
+        //배열2/배열3..등등 이런식으로 생김
+
+        List<BoardListDTO> dtoList = result.get().map(objects->{
+//근데 이 result에 있는 배열을 map으로 배열을 피고, 각각의 요소들을 objects[0],[1]으로 순번을매긴다.
+            //그리고 그 순번을 매긴것들을 listDTO안에 넣는다.
+            //listDTO는 반환되는데, 이 listDTO들이 또 collet로 모여진다
+            //collect로 모여진 애들은 dtoList로 합쳐진다...그 collect(Collectors.toList());한것들은
+            //dtoList로 담아진다.
+            //즉, Page<Object[]> result 리스트 내에 있던 요소들은 entity였는데,
+            //이 entity요소들을 map으로 펼치면서 dto로 다시 값을 넣는것이다.
+
+            BoardListDTO listDTO = BoardListDTO.builder()//연관관계가 많을때 추천되는방법임.
+                    .bno((Long)objects[0])
+                    .title((String)objects[1])
+                    .writer((String)objects[2])
+                    .regDate((LocalDateTime)objects[3])
+                    .replyCount((Long)objects[4])
+                    .build();
+
+            return listDTO;
+        }).collect(Collectors.toList());
+
+        //boardList가 배열 이어서, 매칭이 안되서 modelmapper는 못쓰므로 노가다가 필요함
+
+        return new PageResponseDTO<>(pageRequestDTO, (int)result.getTotalElements(), dtoList);
 
     }
 

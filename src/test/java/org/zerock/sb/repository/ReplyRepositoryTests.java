@@ -4,6 +4,8 @@ import lombok.extern.log4j.Log4j2;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.*;
+import org.springframework.transaction.annotation.Transactional;
 import org.zerock.sb.entity.Board;
 import org.zerock.sb.entity.Reply;
 
@@ -44,12 +46,16 @@ public class ReplyRepositoryTests {
 
     }
 
+    @Transactional
     @Test
     public void testRead(){
 
         Long rn = 1L;
         Reply reply = replyRepository.findById(rn).get();
+
         log.info(reply);
+
+        log.info(reply.getBoard());
 
     }
 
@@ -61,5 +67,48 @@ public class ReplyRepositoryTests {
 
    replyList.forEach (reply-> log.info(reply));
     }
+
+    @Test
+    public void testListOfBoard(){
+        Pageable pageable =
+                PageRequest.of(0,10, Sort.by("rno").descending());
+
+        Page<Reply> result = replyRepository.getListByBno(197L,pageable);
+        log.info(result.getTotalElements());
+        result.get().forEach(reply->log.info(reply));
+
+    }
+
+    @Test
+    public void testCountOfBoard(){
+
+        Long bno = 190L;
+
+        //ex)120일 경우
+        int count = replyRepository.getReplyCountOfBoard(bno);
+
+        int lastPage = (int)(Math.ceil(count/10.0));
+        if(lastPage == 0){
+            lastPage = 1;
+        }
+        //3가지 입력 : 0부터 시작하는 페이지번호(마지막 페이지가 12인경우-> 11) , 사이즈, 소트
+        Pageable pageable = PageRequest.of(lastPage -1, 10);//sort.by제외->asc로자동처리
+        Page<Reply> result = replyRepository.getListByBno(bno, pageable);//해당 게시물의 댓글 목록 가져오기
+
+        log.info("total:"+result.getTotalElements());
+        log.info("..." + result.getTotalPages());
+
+        result.get().forEach(reply->{
+            log.info(reply);
+        });
+    }
+    //121/10.0 ==>12 * 10 120 limit 110,120
+//        int lastPageNum = (int)(Math.ceil(count / (double)10)); //double로 한페이지당 10개씩 뿌리기
+//
+//        int lastEnd = lastPageNum * 10;//120
+//        int lastStart = lastEnd - 10;
+//
+//        log.info(lastStart + " : " + lastEnd);
+//
 
 }

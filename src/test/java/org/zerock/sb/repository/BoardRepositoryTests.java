@@ -53,7 +53,7 @@ public class BoardRepositoryTests {
     @Test
     public void testEx1(){
 
-        Pageable pageable = PageRequest.of(1,10,Sort.by("bno").descending());
+        Pageable pageable = PageRequest.of(0,10,Sort.by("bno").descending());
         Page<Object[]> result = boardRepository.ex1(pageable);
 
         result.get().forEach(element -> {//루프로 돌리면 배열인데
@@ -64,4 +64,21 @@ public class BoardRepositoryTests {
     }
 
 
+
+    @Test
+    public void testSearchWithReplyCount(){
+
+
+        char[] typeArr = {'T'};
+        String keyword="10";
+
+        Pageable pageable = PageRequest.of(0,10,Sort.by("bno").descending());
+
+        Page<Object[]> result = boardRepository.searchWithReplyCount(typeArr, keyword, pageable);
+
+        result.get().forEach(arr->
+            log.info(Arrays.toString(arr)
+            ));
+
+    }
 }

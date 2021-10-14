@@ -39,6 +39,7 @@
                 <th scope="row">[[${board.bno}]]</th>
                 <td><a th:href="|javascript:movePage(${responseDTO.page}, ${board.bno} )|">[[${board.title}]]</a> </td>
                 <td>[[${ board.writer}]]</td>
+                <td>[[${board.replyCount}]]</td>
                 <td>[[${#temporals.format(board.regDate, 'yyyy/MM/dd')}]]</td>
             </tr>
             </tbody>
