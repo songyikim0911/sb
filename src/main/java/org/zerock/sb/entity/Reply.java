@@ -29,5 +29,8 @@ public class Reply {
     @CreationTimestamp
     private LocalDateTime replyDate;
 
+    public void setText(String text){
+        this.replyText = text;
+    }
 
 }

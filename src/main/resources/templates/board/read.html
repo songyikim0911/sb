@@ -151,10 +151,17 @@
     <script th:inline="javascript">
 
         const bno =[[${dto.bno}]]
+        let replyPage = 1
+        let replySize = 10
+
+
 
         function makeListAndPaging(replyPageResponse){
 
             const dtoList = replyPageResponse.dtoList
+
+            replyPage =replyPageResponse.page
+            replySize = replyPageResponse.size
 
             console.log(dtoList)
 
@@ -163,13 +170,14 @@
             for (const reply of dtoList){
                 console.log(reply)
                 str += " <li class='list-group-item d-flex justify-content-between align-items-center'>"
-                str +=`<div><span>${reply.rno}--------${reply.replyText}</span></div>`
+                str +=`<div class="replyBox" data-rno="${reply.rno}"><span>${reply.rno}</span><span class="rtext">${reply.replyText}</span>
+                <button class="btn btn-sm btn-warning" onclick="modifyReply(this)">수정</button>
+                </div>`
                 str +="</li>"
 
 
             }
 
-            console.log(str)
             document.querySelector(".replyUL").innerHTML = str
 
             //paging
@@ -222,7 +230,95 @@
             registerAjax();
         }
 
+        let cloneReply = null
+        let targetLi = null;
 
+
+        function modifyReply(ele){
+
+            const targetDiv = ele.closest(".replyBox")
+            const currentTargetLi = ele.closest("li")
+
+            if(targetLi === null){
+                targetLi = currentTargetLi
+            }else if(targetLi !== currentTargetLi){
+               // alert("기존의 댓글 수정 강제 취소")
+                const currentTargetLi = ele.closest("li")
+                targetLi.querySelector("div").remove()
+                targetLi.appendChild(cloneReply)
+
+                targetLi = currentTargetLi
+
+            }
+
+            cloneReply = targetDiv.cloneNode(true);
+
+
+            const replyText = targetDiv.querySelector(".rtext").innerHTML
+            const rno = targetDiv.getAttribute("data-rno")
+
+            //댓글의 번호와 댓글 원본 내용
+            //console.log(rno, replyText)
+
+            const modifyForm = `<div><input type="text" class="editText" value="${replyText}">
+                                <button onclick="modifyReplySend(this)">수정</button>
+                                <button onclick="deleteReply()">삭제</button>
+                                <button onclick="cancelModifyReply(this)">취소</button></div>`
+
+            targetLi.innerHTML = modifyForm
+
+        }
+
+        function cancelModifyReply(ele){
+
+            ele.closest("div").remove()
+
+            //targetLi의 안쪽 element 삭제
+            targetLi.appendChild(cloneReply);
+
+
+        }
+
+        function deleteReply(){
+            const rno = cloneReply.getAttribute("data-rno")
+            async function sendDeleteReply(){
+                const response = await axios.delete(`/replies/${bno}/${rno}?page=${replyPage}&size=${replySize}`)
+                //목록데이터를 반환하는 부분 필요
+                const replyPageResponse = await response.data
+
+                alert("댓글이 삭제 되었습니다")
+
+                console.log(replyPageResponse)
+
+                makeListAndPaging(replyPageResponse)
+            }
+            sendDeleteReply()
+        }
+
+
+        function modifyReplySend(ele){
+            const rno = cloneReply.getAttribute("data-rno")
+            const replyText = document.querySelector(".editText").value
+
+            //{rno:rno, replyText:replyText}
+            const replyObj = {rno, replyText, bno}
+
+            async function updateReply(){
+
+                const response = await axios.put(`/replies/${bno}/${rno}?page=${replyPage}&size=${replySize}`, replyObj)
+                const replyPageResponse = await response.data
+
+                alert("댓글이 수정 되었습니다")
+
+                console.log(replyPageResponse)
+
+                makeListAndPaging(replyPageResponse)
+
+            }
+
+            updateReply()
+
+        }
 
         getList(-1)
 
