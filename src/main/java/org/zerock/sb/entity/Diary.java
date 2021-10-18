@@ -1,12 +1,14 @@
 package org.zerock.sb.entity;
 
 import lombok.*;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import java.time.LocalDateTime;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -16,7 +18,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter//엔티티는 가능하면 불변, 게터
-@ToString
+@ToString(exclude ={"tags", "pictures"})
 public class Diary {
 
     @Id
@@ -35,11 +37,20 @@ public class Diary {
     @UpdateTimestamp//자동으로 수정시간
     private LocalDateTime modDate;
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.LAZY)
     @CollectionTable(name="tbl_diary_tag")
-    private Set<String> tags;
+    @Fetch(value = FetchMode.JOIN)
+    @BatchSize(size = 50)
+    @Builder.Default
+    private Set<String> tags = new HashSet<>();
 //보통은 set을쓰지만,list가 중복적인 데이터를 발생시킬수있어서 list로
 //collection을 넣어놓으면 list나 set 들어갈 수 있고
     //일반적으로 연관관계에서는 list보다는 set에 많이 들어간다.
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @CollectionTable(name="tbl_diary_picture")
+    @Fetch(value = FetchMode.JOIN)
+    @BatchSize(size = 50)
+   private Set<DiaryPicture> pictures;
 
 }
