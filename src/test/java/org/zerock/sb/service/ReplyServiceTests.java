@@ -6,6 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.zerock.sb.dto.PageRequestDTO;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
+
 @SpringBootTest
 @Log4j2
 public class ReplyServiceTests {
@@ -22,5 +25,6 @@ public class ReplyServiceTests {
 
         log.info(replyService.getListOfBoard(bno, pageRequestDTO));
     }
+
 
 }

@@ -6,9 +6,12 @@ import org.hibernate.annotations.UpdateTimestamp;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 @Entity//처음에 엔티티를 만들면 오류가 남 -> id가 없어서 그렇다. entity는 무조건 id를줘야함.
+@Table(name="tbl_diary")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -33,7 +36,10 @@ public class Diary {
     private LocalDateTime modDate;
 
     @ElementCollection
-    private List<String> tags;
+    @CollectionTable(name="tbl_diary_tag")
+    private Set<String> tags;
 //보통은 set을쓰지만,list가 중복적인 데이터를 발생시킬수있어서 list로
+//collection을 넣어놓으면 list나 set 들어갈 수 있고
+    //일반적으로 연관관계에서는 list보다는 set에 많이 들어간다.
 
 }

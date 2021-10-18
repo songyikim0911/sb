@@ -7,8 +7,8 @@
 </head>
 <body>
 
-
 <div layout:fragment="content">
+
     <div class="card-body">
 
         <div class="float-end" >
@@ -37,9 +37,10 @@
             <tbody>
             <tr th:each="board:${responseDTO.dtoList}">
                 <th scope="row">[[${board.bno}]]</th>
-                <td><a th:href="|javascript:movePage(${responseDTO.page}, ${board.bno} )|">[[${board.title}]]</a> </td>
+                <td><a th:href="|javascript:movePage(${responseDTO.page}, ${board.bno} )|">[[${board.title}]]</a>
+                    [[${board.replyCount}]]
+                </td>
                 <td>[[${ board.writer}]]</td>
-                <td>[[${board.replyCount}]]</td>
                 <td>[[${#temporals.format(board.regDate, 'yyyy/MM/dd')}]]</td>
             </tr>
             </tbody>
@@ -70,83 +71,81 @@
 
     </div>
 
+
+
+
 </div>
 
+<th:block  layout:fragment="script">
 
-    <th:block  layout:fragment="script">
 
-
-        <div class="modal" tabindex="-1">
-            <div class="modal-dialog">
-                <div class="modal-content">
-                    <div class="modal-header">
-                        <h5 class="modal-title">Modal title</h5>
-                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                    </div>
-                    <div class="modal-body">
-                        <p>Modal body text goes here.</p>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                        <button type="button" class="btn btn-primary">Save changes</button>
-                    </div>
+    <div class="modal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modal title</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Modal body text goes here.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-primary">Save changes</button>
                 </div>
             </div>
         </div>
+    </div>
 
 
 
-        <script th:inline="javascript">
+    <script th:inline="javascript">
 
-            const myModal = new bootstrap.Modal(document.querySelector(".modal"))
+        const myModal = new bootstrap.Modal(document.querySelector(".modal"))
 
-            const result = [[${result}]]
+        const result = [[${result}]]
 
-            if(result){
-                myModal.show()
+        if(result){
+            myModal.show()
+        }
+
+        const pageRequest = [[${pageRequestDTO}]]
+
+        function movePage(page, bno) {
+
+            console.log(pageRequest)
+
+            let uri ="";
+
+            const type = pageRequest.type
+            const keyword = pageRequest.keyword
+
+            let searchQuery = ''
+            if(type && keyword){
+                searchQuery += `&type=${type}&keyword=${keyword}`
             }
 
-            const pageRequest = [[${pageRequestDTO}]]
-
-            function movePage(page, bno) {
-
-                console.log(pageRequest)
-
-                let uri ="";
-
-                const type = pageRequest.type
-                const keyword = pageRequest.keyword
-
-                let searchQuery = ''
-                if(type && keyword){
-                    searchQuery += `&type=${type}&keyword=${keyword}`
-                }
-
-                if(bno) {
-                    uri = `/board/read?bno=${bno}&page=${page}` + searchQuery
-                }else {
-                    uri = `/board/list?page=${page}` + searchQuery
-                }
-                self.location = uri
+            if(bno) {
+                uri = `/board/read?bno=${bno}&page=${page}` + searchQuery
+            }else {
+                uri = `/board/list?page=${page}` + searchQuery
             }
+            self.location = uri
+        }
 
-            function search() {
-                const searchSelect = document.querySelector("#searchType")
+        function search() {
+            const searchSelect = document.querySelector("#searchType")
 
-                const type = searchSelect.options[searchSelect.selectedIndex].value
+            const type = searchSelect.options[searchSelect.selectedIndex].value
 
-                const keyword = encodeURI(document.querySelector("#keyword").value)
+            const keyword = encodeURI(document.querySelector("#keyword").value)
 
-                console.log("type", type, "keyword", keyword)
+            console.log("type", type, "keyword", keyword)
 
-                self.location =`/board/list?page=1&type=${type}&keyword=${keyword}`
-            }
+            self.location =`/board/list?page=1&type=${type}&keyword=${keyword}`
+        }
 
-        </script>
-
-
-    </th:block>
+    </script>
 
 
-</body>
-</html>
+</th:block>
