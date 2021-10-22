@@ -3,6 +3,7 @@ package org.zerock.sb.controller;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Required;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -28,6 +29,7 @@ public class BoardController {
         model.addAttribute("responseDTO", boardService.getListWithReply(pageRequestDTO));
     }
 
+    @PreAuthorize("isAutehnticated()")
     @GetMapping("/register")
     public void register(){
 

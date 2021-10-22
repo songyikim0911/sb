@@ -5,8 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
-import org.zerock.sb.dto.DiaryDTO;
-import org.zerock.sb.dto.DiaryPictureDTO;
+import org.zerock.sb.dto.*;
 import org.zerock.sb.entity.Diary;
 import org.zerock.sb.entity.DiaryPicture;
 
@@ -50,7 +49,7 @@ public class DiaryServiceTests {
 
     }
 
-    @Transactional(readOnly = true)
+  //  @Transactional(readOnly = true)
     @Test
     public void testRead(){
         Long dno = 101L;
@@ -63,4 +62,31 @@ public class DiaryServiceTests {
 
     }
 
+
+    @Test
+    public void testList(){
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder().build();
+
+        PageResponseDTO<DiaryDTO> responseDTO = diaryService.getList(pageRequestDTO);
+
+        log.info(responseDTO);
+
+        responseDTO.getDtoList().forEach(diaryDTO -> {
+            log.info(diaryDTO);
+            log.info(diaryDTO.getTags());
+            log.info(diaryDTO.getPictures());
+            log.info("------------");
+        });
+
+
+    }
+    @Test
+    public void testList2() {
+        PageRequestDTO pageRequestDTO = PageRequestDTO.builder().build();
+
+        PageResponseDTO<DiaryListDTO> responseDTO
+                = diaryService.getListWithFavorite(pageRequestDTO);
+
+        log.info(responseDTO);
+    }
 }
