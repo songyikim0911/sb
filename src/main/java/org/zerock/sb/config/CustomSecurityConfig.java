@@ -9,6 +9,10 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.zerock.sb.security.filter.TokenCheckFilter;
+import org.zerock.sb.security.filter.TokenGenerateFilter;
+import org.zerock.sb.security.util.JWTUtil;
 
 @Configuration
 @Log4j2
@@ -32,5 +36,27 @@ public PasswordEncoder passwordEncoder(){
         http.csrf().disable();
         http.logout();
 
+        http.addFilterBefore(tokenCheckFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(tokenGenerateFilter(), UsernamePasswordAuthenticationFilter.class);
+        //로그인전에 확인하는것.
+
     }
+
+    @Bean
+    public TokenCheckFilter tokenCheckFilter(){
+    return new TokenCheckFilter(jwtUtil());
+    }
+
+    @Bean
+    public TokenGenerateFilter tokenGenerateFilter() throws Exception {
+    return new TokenGenerateFilter("/jsonApiLogin",authenticationManager(),jwtUtil());//이 안에 문자열이 로그인 경로가 되는것임
+        //우리는 이런파라미터들을 json으로 뺄예정
+    }
+
+    @Bean
+    public JWTUtil jwtUtil(){
+            return new JWTUtil();
+    }
+
+
 }
