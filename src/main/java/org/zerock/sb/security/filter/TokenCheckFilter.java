@@ -32,7 +32,7 @@ public class TokenCheckFilter extends OncePerRequestFilter {
 
         log.info(path);
 
-        if(path.startsWith("/api")){
+        if(path.startsWith("/api/222")){
             //check token
             String authToken = request.getHeader("Authorization");//header 활용해서 토큰..
 

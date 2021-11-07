@@ -29,7 +29,7 @@ public class BoardController {
         model.addAttribute("responseDTO", boardService.getListWithReply(pageRequestDTO));
     }
 
-    @PreAuthorize("isAutehnticated()")
+
     @GetMapping("/register")
     public void register(){
 

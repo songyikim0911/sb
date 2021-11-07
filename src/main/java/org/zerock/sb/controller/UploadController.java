@@ -41,7 +41,7 @@ public class UploadController {
 		for (MultipartFile uploadFile: uploadFiles) {
 
 			if(uploadFile.getContentType().startsWith("image") == false) {
-				log.warn("this file is not image type");
+			 	log.warn("this file is not image type");
 				return new ResponseEntity<>(HttpStatus.FORBIDDEN);
 			}
 
